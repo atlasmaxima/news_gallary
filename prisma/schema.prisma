@@ -1,0 +1,25 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "darwin-arm64", "linux-arm64-openssl-1.1.x"]
+}
+
+
+model Article {
+  id          String     @id @default(uuid())
+  byline      Byline     @relation(fields: [bylineId], references: [bylineId])
+  bylineId    Int        @unique
+  image       String?
+  head        String
+  teaser      String
+}
+
+model Byline {
+  bylineId Int        @id @default(autoincrement())
+  text     String
+  articles Article[]
+}

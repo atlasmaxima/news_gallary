@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: 'test-postgres'
+    image: 'postgres:latest'
+    restart: always
+    ports:
+      - '15432:5432'
+    networks:
+      - my-network
+    volumes:
+      - 'pgdata:/var/lib/postgresql/data/'
+    environment:
+      POSTGRES_USER: /run/secrets/postgres_user
+      POSTGRES_PASSWORD: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+      - postgres_user
+    expose: 
+      - 5432
+      
+  next:
+    container_name: 'test-next'
+    restart: unless-stopped
+    image: node:16
+    command: npm run dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/srv/next:rw
+    working_dir: /srv/next
+    environment:
+      POSTGRES_PASSWORD: /run/secrets/postgres_url
+    secrets:
+      - postgres_url
+    depends_on:
+      - postgres
+    networks:
+      - my-network
+
+secrets:
+  postgres_password:
+    file: ./postgres_password.txt
+  postgres_user:  
+    file: ./postgres_user.txt
+  postgres_url:
+    file: ./postgres_url.txt
+
+volumes:
+  pgdata: {}
+
+networks:
+  my-network:
+    driver: bridge
