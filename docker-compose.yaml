@@ -31,7 +31,7 @@ services:
       - .:/srv/next:rw
     working_dir: /srv/next
     environment:
-      POSTGRES_PASSWORD: /run/secrets/postgres_url
+      DATABASE_URL: /run/secrets/postgres_url
     secrets:
       - postgres_url
     depends_on:
